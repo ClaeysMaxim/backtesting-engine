@@ -17,37 +17,42 @@ Floating point cannot represent most decimal prices exactly, and errors such as
 `0.03 / 0.01 = 2.9999999999999996` silently change position sizes. The engine therefore
 works in integers.
 
-| Value                   | Type     | Unit                                        |
-| ----------------------- | -------- | ------------------------------------------- |
-| Timestamps              | `number` | epoch milliseconds, UTC                     |
-| Candle prices           | `number` | ticks (the instrument's price tick size)    |
-| Candle volume           | `number` | quantity steps (the instrument's step size) |
-| Order and position size | `bigint` | quantity steps                              |
-| Money (cash, fees, PnL) | `bigint` | atoms: 1e-8 of the quote asset (USDT)       |
+Every amount is a `bigint` count of **atoms**: 1e-8 of an asset, the precision Binance uses
+for prices and quantities.
 
-- **Why `bigint` for accounting:** a `number` is only exact up to 2^53. Multiplying a price
-  in ticks by a quantity in steps can pass that limit, and JavaScript then loses precision
-  without an error. `bigint` cannot overflow silently.
-- **Why `number` for candles:** prices in ticks and timestamps stay far below 2^53, and
-  millions of `bigint` values would cost much more memory. Every candle field is checked
-  with `Number.isSafeInteger` when it is created, and converted to `bigint` where it enters
-  the accounting.
-- **Why atoms of 1e-8:** the notional of a fill is `price ticks × quantity steps × tick size ×
-step size`. For BTCUSDT that is `0.01 × 0.00001 = 1e-7` USDT per tick-step, which is
-  exactly 10 atoms. As long as `tick size × step size` is a multiple of 1e-8, every notional
-  is an exact integer number of atoms. Instruments that break this rule are rejected.
-- **Tick size and step size are parsed from decimal strings** (as Binance publishes them),
-  never through `parseFloat`.
+| Value                                  | Type     | Unit                                      |
+| -------------------------------------- | -------- | ----------------------------------------- |
+| Timestamps                             | `number` | epoch milliseconds, UTC                   |
+| Prices (candles, fills)                | `bigint` | quote atoms per whole unit of the base    |
+| Quantities (volume, orders, positions) | `bigint` | base atoms                                |
+| Money (cash, fees, PnL)                | `bigint` | quote atoms                               |
+| Tick size and step size                | `bigint` | quote atoms per base unit, and base atoms |
+
+- **Why `bigint` everywhere:** a `number` is only exact up to 2^53, and JavaScript loses
+  precision beyond that without an error. Real data passes that limit at this scale: the
+  hourly SHIBUSDT volume of May 2021 reaches 1.5e21 base atoms. `bigint` cannot overflow
+  silently. Measured on Node 26, a million candles take about 206 MB instead of 168 MB with
+  `number` fields, and summing them is about 3 times slower. That is acceptable here.
+- **Why a fixed scale instead of ticks and steps:** Binance changes symbol filters over
+  time. In BTCUSDT hourly data from 2017 to 2021, most volumes are not a multiple of the
+  current step size of 0.00001 BTC. A fixed scale reads any historical value. Tick size and
+  step size are only used where exchange rules apply: slippage and order sizes.
+- **Notional:** `price × quantity / 1e8` quote atoms. When that division is not exact, it is
+  rounded against the trader (see "Rounding").
+- **Decimal strings** from Binance are parsed with `parseDecimal`, never through
+  `parseFloat`.
 
 ## Rounding
 
 Every rounding step goes against the trader. Results are then conservative and, because the
 rule is fixed, deterministic.
 
-- Fee: `ceil(notional × fee bps / 10 000)` atoms.
+- Notional: rounded up for a buy (what it costs), down for a sell (what it brings in) and
+  down when a position is marked to market.
+- Fee: `ceil(notional × fee bps / 10 000)` quote atoms.
 - Slippage: a whole number of ticks, added to the price of a buy and subtracted from a sell.
-- Quantity: when an order is sized from an amount of cash, it is rounded down to whole
-  steps, so it never spends more than that amount.
+- Quantity: when an order is sized from an amount of cash, it is rounded down to a multiple
+  of the step size, so it never spends more than that amount.
 
 ## Fill model
 
@@ -71,14 +76,17 @@ rule is fixed, deterministic.
 - Equity is marked to market at the close of every candle, not only when a trade closes.
 - A position that is still open at the end of the data is reported as open, marked at the
   last close. It is never dropped silently.
-- Invariant, checked with property-based tests: `cash + position value = starting cash +
-realised PnL + unrealised PnL - fees`, for any sequence of fills.
+- Invariant, checked with property-based tests for any sequence of fills:
+  `cash + position value = starting cash + realised PnL + unrealised PnL - fees`.
 
 ## Data
 
-- Source: Binance public market data (data.binance.vision). Downloads are verified against
-  the published checksum files. To verify in phase 3: the timestamp unit of spot klines
-  (milliseconds or microseconds) for recent data.
+- Source: Binance public market data (data.binance.vision). Every zip file has a
+  `.CHECKSUM` file with its SHA-256 hash (`<hash>  <file name>`), and downloads are verified
+  against it.
+- Spot kline timestamps are in milliseconds in older files and in microseconds in recent
+  ones (BTCUSDT hourly: milliseconds in May 2021, microseconds in June 2025). Both are
+  converted to milliseconds when read.
 - Validation reports duplicates, gaps, unsorted rows and impossible candles
   (`low > open`, `high < close`, negative volume). Gaps are reported, never interpolated:
   filling them would invent prices.
