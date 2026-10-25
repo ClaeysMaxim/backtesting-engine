@@ -15,8 +15,12 @@ The reasoning behind these choices is in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Status
 
-Work in progress. The project setup is done (TypeScript, tests, linting, CI on three operating
-systems). Next up is the domain model: candles, orders, fills, positions and the portfolio.
+Work in progress.
+
+- Done: project setup (TypeScript, tests, linting, CI on three operating systems) and the
+  domain model (exact decimal parsing, instruments, candles, market order fills and a
+  long-only portfolio), with property-based tests for the accounting.
+- Next: downloading and validating historical candles from Binance's public market data.
 
 ## Getting started
 
