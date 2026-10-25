@@ -1,5 +1,6 @@
 // Public entry point; modules are re-exported here as they are added.
 export { parseKlineCsv, parseKlineRow } from './data/binance-klines.ts';
+export { verifySha256 } from './data/checksum.ts';
 export { findSeriesProblems, INTERVALS, isInterval } from './data/series.ts';
 export type { Interval, SeriesProblem } from './data/series.ts';
 export { readZip } from './data/zip.ts';
