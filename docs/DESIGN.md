@@ -104,6 +104,10 @@ rule is fixed, deterministic.
 - Validation reports duplicates, gaps, unsorted rows and impossible candles
   (`low > open`, `high < close`, negative volume). Gaps are reported, never interpolated:
   filling them would invent prices.
+- The loader checks every archive against its checksum again when it reads it, so data that
+  changed on disk is never used. Duplicates, overlaps, unsorted or misaligned candles and
+  candles of the wrong length stop the load, because they mean the data is broken. Gaps can
+  be real exchange outages, so they are returned next to the candles instead.
 - Everything is converted to UTC epoch milliseconds when it is read. Crypto trades 24/7, so
   there are no sessions or daylight saving time to handle.
 

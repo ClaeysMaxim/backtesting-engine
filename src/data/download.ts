@@ -3,12 +3,13 @@ import { dirname } from 'node:path';
 
 import {
   type Archive,
+  archiveCsv,
   archiveFileName,
   archivePath,
   archiveUrl,
 } from './binance-archive.ts';
 import { verifySha256 } from './checksum.ts';
-import { readZip } from './zip.ts';
+import { isMissingFile } from './missing-file.ts';
 
 export type Fetch = (url: string) => Promise<Response>;
 
@@ -39,11 +40,8 @@ export async function downloadArchive(
     fetchBytes(fetchFn, `${url}.CHECKSUM`),
   ]);
   verifySha256(zip, new TextDecoder().decode(checksum), name);
-  const entries = readZip(zip);
-  const csvName = name.replace(/\.zip$/, '.csv');
-  if (entries.length !== 1 || entries[0]?.name !== csvName) {
-    throw new SyntaxError(`${name} should contain only ${csvName}`);
-  }
+  // Throws unless the zip holds exactly the expected CSV.
+  archiveCsv(archive, zip);
   await mkdir(dirname(path), { recursive: true });
   // The checksum is written last, so an interrupted run is retried next time.
   await writeFile(path, zip);
@@ -75,10 +73,6 @@ async function isVerifiedOnDisk(
     }
     throw error;
   }
-}
-
-function isMissingFile(error: unknown): boolean {
-  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
 async function fetchBytes(fetchFn: Fetch, url: string): Promise<Uint8Array> {
