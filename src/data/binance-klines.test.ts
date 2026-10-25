@@ -50,8 +50,14 @@ describe('parseKlineRow', () => {
   });
 
   it.each([
-    ['a time that is neither ms nor µs', ROW_2017.replace('1502942400000', '150294240000')],
-    ['a µs time that is not a whole ms', ROW_2025.replace('1748736000000000', '1748736000000001')],
+    [
+      'a time that is neither ms nor µs',
+      ROW_2017.replace('1502942400000', '150294240000'),
+    ],
+    [
+      'a µs time that is not a whole ms',
+      ROW_2025.replace('1748736000000000', '1748736000000001'),
+    ],
     ['high below close', ROW_2017.replace('4313.62000000', '4300.00000000')],
   ])('rejects %s with a RangeError', (_, row) => {
     expect(() => parseKlineRow(row)).toThrow(RangeError);
@@ -68,7 +74,9 @@ describe('parseKlineCsv', () => {
   });
 
   it('accepts Windows line endings', () => {
-    expect(parseKlineCsv(`${ROW_2017}\r\n${ROW_2017_NEXT}\r\n`)).toHaveLength(2);
+    expect(parseKlineCsv(`${ROW_2017}\r\n${ROW_2017_NEXT}\r\n`)).toHaveLength(
+      2,
+    );
   });
 
   it('skips a header line', () => {
