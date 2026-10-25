@@ -95,6 +95,9 @@ rule is fixed, deterministic.
 - Source: Binance public market data (data.binance.vision). Every zip file has a
   `.CHECKSUM` file with its SHA-256 hash (`<hash>  <file name>`), and downloads are verified
   against it.
+- The zip files are read by a small built-in reader on top of `node:zlib` instead of a
+  dependency. It only supports what Binance publishes (stored or deflated entries, no
+  encryption or ZIP64) and checks every entry's CRC-32 and size.
 - Spot kline timestamps are in milliseconds in older files and in microseconds in recent
   ones (BTCUSDT hourly: milliseconds in May 2021, microseconds in June 2025). Both are
   converted to milliseconds when read.

@@ -2,6 +2,8 @@
 export { parseKlineCsv, parseKlineRow } from './data/binance-klines.ts';
 export { findSeriesProblems, INTERVALS, isInterval } from './data/series.ts';
 export type { Interval, SeriesProblem } from './data/series.ts';
+export { readZip } from './data/zip.ts';
+export type { ZipEntry } from './data/zip.ts';
 export {
   ATOM_DECIMALS,
   ATOMS_PER_UNIT,
