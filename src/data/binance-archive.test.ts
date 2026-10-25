@@ -1,8 +1,10 @@
+import { readFileSync } from 'node:fs';
 import { relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
   type Archive,
+  archiveCsv,
   archiveFileName,
   archivePath,
   archiveUrl,
@@ -74,4 +76,25 @@ describe('archive naming', () => {
       SyntaxError,
     );
   });
+});
+
+describe('archiveCsv', () => {
+  const fixture = (path: string) =>
+    new Uint8Array(readFileSync(new URL(`fixtures/${path}`, import.meta.url)));
+
+  it('returns the CSV inside a Binance archive', () => {
+    const csv = archiveCsv(june, fixture('binance/BTCUSDT-1h-2025-06.zip'));
+
+    expect(csv.split('\n').filter((line) => line !== '')).toHaveLength(3);
+    expect(csv.startsWith('1751317200000000,107577.88000000,')).toBe(true);
+  });
+
+  it.each(['deflated.zip', 'two-files.zip'])(
+    'rejects %s, which holds other files',
+    (name) => {
+      expect(() => archiveCsv(june, fixture(name))).toThrow(
+        /should contain only BTCUSDT-1h-2025-06\.csv/,
+      );
+    },
+  );
 });

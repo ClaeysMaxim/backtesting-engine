@@ -1,6 +1,7 @@
 import { join } from 'node:path';
 
 import type { Interval } from './series.ts';
+import { readZip } from './zip.ts';
 
 export const ARCHIVE_BASE_URL =
   'https://data.binance.vision/data/spot/monthly/klines';
@@ -58,6 +59,22 @@ export function archivePath(dataDir: string, archive: Archive): string {
     interval,
     archiveFileName(archive),
   );
+}
+
+/**
+ * The CSV text inside a downloaded archive. Binance zips hold exactly one
+ * file named like the archive; anything else is rejected.
+ */
+export function archiveCsv(archive: Archive, zip: Uint8Array): string {
+  const csvName = archiveFileName(archive).replace(/\.zip$/, '.csv');
+  const entries = readZip(zip);
+  const [entry] = entries;
+  if (entries.length !== 1 || entry?.name !== csvName) {
+    throw new SyntaxError(
+      `${archiveFileName(archive)} should contain only ${csvName}`,
+    );
+  }
+  return new TextDecoder('utf-8', { fatal: true }).decode(entry.data);
 }
 
 function monthIndex(month: string): number {
