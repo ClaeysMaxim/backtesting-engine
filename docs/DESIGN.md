@@ -62,11 +62,28 @@ rule is fixed, deterministic.
 
 - A strategy can only place orders after a candle has closed. A market order placed at the
   close of candle `t` fills at the open of candle `t + 1`, plus slippage.
-- An order that cannot be paid for (cash below notional plus fee) is rejected, not resized.
+- An order is sized at the close of candle `t` but priced at the open of `t + 1`. If cash
+  cannot pay the notional plus fee at that price (slippage included), the order is rejected
+  and recorded in the result as "rejected: insufficient cash". It is never resized silently.
 - There is no fill on the last candle of the data, because there is no next open.
+- An order placed just before a gap in the data fills at the first open after the gap, as
+  it would when the market reopens. Such fills are marked as post-gap, and the result reports
+  how many there were.
 - Orders are market orders for a quantity that is a positive multiple of the step size. The
   fee is charged in the quote asset on both sides, even though Binance takes the fee of a
   buy in the base asset; both cost the same value.
+
+## Strategies
+
+- A strategy is created once per backtest by a factory, so it can keep its own state (for
+  example running indicator sums). After every closed candle the engine calls
+  `decide(view)`, which returns market orders.
+- Orders give a quantity in base atoms. A sizing helper computes the largest quantity that
+  cash can pay at a given price, rounded down to the step size, with an optional safety
+  buffer for slippage and fees.
+- The view never exposes the candle array. Candles are read through a bounded accessor that
+  only allows indexes up to the current candle, and it is not copied per step. A test proves
+  that a strategy cannot read a future candle.
 
 ## No look-ahead
 
@@ -75,6 +92,11 @@ rule is fixed, deterministic.
 - The engine test suite includes a "change the future" test: change every candle after a
   cut-off, rerun, and assert that every decision and fill before the cut-off is identical.
   A mutation test injects a deliberate leak to prove that the test catches it.
+
+## Performance
+
+- A benchmark measures the throughput of the engine loop in candles per second, so the
+  cost of `bigint` arithmetic is known early instead of discovered late.
 
 ## Accounting
 

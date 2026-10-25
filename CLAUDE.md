@@ -25,7 +25,8 @@ Goal: correctness that can be measured and proven, not "get rich" trading.
 
 - Small steps. One concept per step. Explain why you chose an approach and
   what the alternatives were, briefly.
-- After each step, stop and let me review.
+- After each step, stop and let me review, except where the Git workflow
+  below allows an autonomous merge.
 - Write tests alongside the code (Vitest). Engine logic without tests is
   not done.
 - TypeScript strict mode. No `any` unless justified in a comment.
@@ -44,9 +45,13 @@ only.
 
 - One branch per step, created from an up-to-date main
   (e.g. `chore/setup-vitest`, `feat/domain-model`).
-- Work on the branch, then stop for my review. Only after my OK: commit,
-  push the branch, open a PR and merge it with a merge commit
-  (`gh pr merge --merge --delete-branch`).
+- Commit, push the branch and open a PR. Merge with a merge commit
+  (`gh pr merge --merge --delete-branch`), and only when CI passes on all
+  three OSes (ubuntu, windows, macos).
+- Dependency updates, CI changes and docs-only changes may be merged
+  without waiting for me.
+- Everything else, and every step of Phase 4, 6 and 7: open the PR, then
+  stop so I can review it. Merge only after my OK.
 - Never commit or push directly to main.
 - Branch names, commit messages, PR titles and PR descriptions are in
   English, without AI attribution (no Co-Authored-By, no "Generated with").
