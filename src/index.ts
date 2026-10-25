@@ -6,5 +6,7 @@ export {
   parseAtoms,
 } from './domain/atoms.ts';
 export { parseDecimal } from './domain/decimal.ts';
+export { createInstrument, floorToStep } from './domain/instrument.ts';
+export type { Instrument, InstrumentSpec } from './domain/instrument.ts';
 export { divide } from './domain/rounding.ts';
 export type { Rounding } from './domain/rounding.ts';
