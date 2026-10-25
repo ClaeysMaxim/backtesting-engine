@@ -32,6 +32,9 @@ Goal: correctness that can be measured and proven, not "get rich" trading.
 - Prefer few dependencies. Ask before adding one and say why it's needed.
 - Use current stable versions of tools; don't guess versions from memory,
   check them.
+- Design decisions (number types, rounding, fill model, metrics) live in
+  docs/DESIGN.md. Read it before changing the domain model or the engine, and
+  update it in the same PR when a decision changes.
 
 ## Git workflow
 
