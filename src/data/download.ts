@@ -84,8 +84,10 @@ function isMissingFile(error: unknown): boolean {
 async function fetchBytes(fetchFn: Fetch, url: string): Promise<Uint8Array> {
   const response = await fetchFn(url);
   if (!response.ok) {
+    // HTTP/2 responses carry no status text, so it is only added when present.
+    const reason = response.statusText === '' ? '' : ` ${response.statusText}`;
     throw new Error(
-      `GET ${url} failed: ${String(response.status)} ${response.statusText}`,
+      `GET ${url} failed with HTTP ${String(response.status)}${reason}`,
     );
   }
   return new Uint8Array(await response.arrayBuffer());

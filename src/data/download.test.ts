@@ -92,9 +92,18 @@ describe('downloadArchive', () => {
     const { fetchFn } = fakeServer({});
 
     await expect(downloadArchive(june, dataDir, fetchFn)).rejects.toThrow(
-      /404 Not Found/,
+      /failed with HTTP 404 Not Found$/,
     );
     expect(existsSync(archivePath(dataDir, june))).toBe(false);
+  });
+
+  it('reports an HTTP error without status text, as HTTP/2 sends it', async () => {
+    const fetchFn: Fetch = () =>
+      Promise.resolve(new Response(null, { status: 404 }));
+
+    await expect(downloadArchive(june, dataDir, fetchFn)).rejects.toThrow(
+      /failed with HTTP 404$/,
+    );
   });
 
   it('rejects an archive that does not hold the expected CSV', async () => {
