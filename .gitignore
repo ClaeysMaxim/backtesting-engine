@@ -147,3 +147,11 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+
+# Marktdata (te groot voor git, wordt gedownload)
+data/
+
+# OS-bestanden
+.DS_Store
+Thumbs.db
