@@ -12,5 +12,12 @@ export { fillMarketOrder } from './domain/fill.ts';
 export type { Costs, Fill, MarketOrder, Side } from './domain/fill.ts';
 export { createInstrument, floorToStep } from './domain/instrument.ts';
 export type { Instrument, InstrumentSpec } from './domain/instrument.ts';
+export {
+  applyFill,
+  canApplyFill,
+  createPortfolio,
+  valueAt,
+} from './domain/portfolio.ts';
+export type { Portfolio, Valuation } from './domain/portfolio.ts';
 export { divide } from './domain/rounding.ts';
 export type { Rounding } from './domain/rounding.ts';

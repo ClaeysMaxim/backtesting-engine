@@ -55,6 +55,8 @@ rule is fixed, deterministic.
   and is never better than the open.
 - Quantity: when an order is sized from an amount of cash, it is rounded down to a multiple
   of the step size, so it never spends more than that amount.
+- Cost basis: the share released by a partial sell is rounded up, so realised PnL is never
+  overstated. Selling the whole position releases exactly what is left.
 
 ## Fill model
 
@@ -81,8 +83,12 @@ rule is fixed, deterministic.
 - Equity is marked to market at the close of every candle, not only when a trade closes.
 - A position that is still open at the end of the data is reported as open, marked at the
   last close. It is never dropped silently.
-- Invariant, checked with property-based tests for any sequence of fills:
-  `cash + position value = starting cash + realised PnL + unrealised PnL - fees`.
+- A buy that cannot be paid in full and a sell of more than is held are both rejected.
+- Properties checked with property-based tests for any sequence of fills:
+  - `cash + position value = starting cash + realised PnL + unrealised PnL - fees`, and
+    cash, quantity and cost basis never go negative.
+  - When every trade happens at the price used to value the portfolio, equity never goes
+    up. Rounding, fees and slippage can only cost money, never create it.
 
 ## Data
 
