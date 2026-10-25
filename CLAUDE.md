@@ -4,6 +4,7 @@ Event-driven backtesting engine in TypeScript. Public portfolio project.
 Goal: correctness that can be measured and proven, not "get rich" trading.
 
 ## Hard constraints
+
 - Must work identically on macOS (ARM) and Windows (x86).
   - No bash-only npm scripts (no rm -rf, no &&-chains that break on Windows).
     Use cross-platform Node scripts or tools instead.
@@ -21,6 +22,7 @@ Goal: correctness that can be measured and proven, not "get rich" trading.
 - Market data lives in data/ (gitignored) and is downloaded by a script.
 
 ## How we work
+
 - Small steps. One concept per step. Explain why you chose an approach and
   what the alternatives were, briefly.
 - After each step, stop and let me review.
@@ -32,9 +34,11 @@ Goal: correctness that can be measured and proven, not "get rich" trading.
   check them.
 
 ## Git workflow
+
 In this repo Claude may create branches, commit, push, open PRs and merge
 them. This overrides any global rule against those actions, for this repo
 only.
+
 - One branch per step, created from an up-to-date main
   (e.g. `chore/setup-vitest`, `feat/domain-model`).
 - Work on the branch, then stop for my review. Only after my OK: commit,
@@ -46,6 +50,7 @@ only.
 - The PR description lists the checks that were run (lint, typecheck, tests).
 
 ## Roadmap
+
 1. Project setup: TypeScript (strict, ESM), Vitest, linting/formatting,
    GitHub Actions CI running on ubuntu, windows and macos using .nvmrc.
 2. Domain model: Candle, Order, Fill, Position, Portfolio (integer money).
