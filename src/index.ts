@@ -5,6 +5,8 @@ export {
   notional,
   parseAtoms,
 } from './domain/atoms.ts';
+export { createCandle } from './domain/candle.ts';
+export type { Candle } from './domain/candle.ts';
 export { parseDecimal } from './domain/decimal.ts';
 export { createInstrument, floorToStep } from './domain/instrument.ts';
 export type { Instrument, InstrumentSpec } from './domain/instrument.ts';
