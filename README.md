@@ -34,18 +34,33 @@ npm ci
 
 ## Scripts
 
-| Command                | What it does                                            |
-| ---------------------- | ------------------------------------------------------- |
-| `npm test`             | Run the tests once                                      |
-| `npm run test:watch`   | Run the tests in watch mode                             |
-| `npm run typecheck`    | Type-check with `tsc` (no build output)                 |
-| `npm run lint`         | Lint with ESLint, including the determinism rules       |
-| `npm run format`       | Format all files with Prettier                          |
-| `npm run format:check` | Check formatting without changing files                 |
-| `npm run check`        | Run format check, lint, typecheck and tests, as CI does |
+| Command                 | What it does                                            |
+| ----------------------- | ------------------------------------------------------- |
+| `npm test`              | Run the tests once                                      |
+| `npm run test:watch`    | Run the tests in watch mode                             |
+| `npm run typecheck`     | Type-check with `tsc` (no build output)                 |
+| `npm run lint`          | Lint with ESLint, including the determinism rules       |
+| `npm run format`        | Format all files with Prettier                          |
+| `npm run format:check`  | Check formatting without changing files                 |
+| `npm run check`         | Run format check, lint, typecheck and tests, as CI does |
+| `npm run data:download` | Download monthly candles from Binance (see below)       |
 
 There is no build step: Node runs the TypeScript sources directly, so relative imports use the
 `.ts` extension.
+
+## Market data
+
+Historical candles come from [Binance's public market data](https://data.binance.vision). No
+API key is needed. Download whole months of one symbol and interval:
+
+```sh
+npm run data:download -- --symbol BTCUSDT --interval 1h --from 2024-01 --to 2024-12
+```
+
+Every archive is checked against Binance's published SHA-256 checksum before it is written to
+`data/` (ignored by git). Months that are already on disk and still match their checksum are
+skipped, so the command can be rerun safely. A month that Binance has not published yet fails
+with HTTP 404.
 
 ## License
 
