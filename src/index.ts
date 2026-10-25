@@ -8,6 +8,8 @@ export {
 export { createCandle } from './domain/candle.ts';
 export type { Candle } from './domain/candle.ts';
 export { parseDecimal } from './domain/decimal.ts';
+export { fillMarketOrder } from './domain/fill.ts';
+export type { Costs, Fill, MarketOrder, Side } from './domain/fill.ts';
 export { createInstrument, floorToStep } from './domain/instrument.ts';
 export type { Instrument, InstrumentSpec } from './domain/instrument.ts';
 export { divide } from './domain/rounding.ts';
