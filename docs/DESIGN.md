@@ -51,6 +51,8 @@ rule is fixed, deterministic.
   down when a position is marked to market.
 - Fee: `ceil(notional × fee bps / 10 000)` quote atoms.
 - Slippage: a whole number of ticks, added to the price of a buy and subtracted from a sell.
+  A sell price stops at one tick (or at the open, if that is lower), so it stays positive
+  and is never better than the open.
 - Quantity: when an order is sized from an amount of cash, it is rounded down to a multiple
   of the step size, so it never spends more than that amount.
 
@@ -60,6 +62,9 @@ rule is fixed, deterministic.
   close of candle `t` fills at the open of candle `t + 1`, plus slippage.
 - An order that cannot be paid for (cash below notional plus fee) is rejected, not resized.
 - There is no fill on the last candle of the data, because there is no next open.
+- Orders are market orders for a quantity that is a positive multiple of the step size. The
+  fee is charged in the quote asset on both sides, even though Binance takes the fee of a
+  buy in the base asset; both cost the same value.
 
 ## No look-ahead
 
