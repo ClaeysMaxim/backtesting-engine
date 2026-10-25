@@ -1,4 +1,5 @@
 // Public entry point; modules are re-exported here as they are added.
+export { parseKlineCsv, parseKlineRow } from './data/binance-klines.ts';
 export {
   ATOM_DECIMALS,
   ATOMS_PER_UNIT,
