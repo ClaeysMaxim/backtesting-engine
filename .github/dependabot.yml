@@ -1,0 +1,33 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # New releases wait a week, so a compromised version is usually caught before we pull it in.
+    cooldown:
+      default-days: 7
+    groups:
+      minor-and-patch:
+        patterns: ['*']
+        # typescript-eslint pins a TypeScript range, so a TypeScript bump gets its own PR
+        # and cannot block the rest of the group.
+        exclude-patterns: [typescript]
+        update-types: [minor, patch]
+    ignore:
+      # Node is pinned in .nvmrc, which Dependabot does not update; the types follow that pin.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # TypeScript 7 drops the API typescript-eslint relies on; switching is a deliberate choice.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
