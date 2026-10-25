@@ -17,10 +17,13 @@ The reasoning behind these choices is in [docs/DESIGN.md](docs/DESIGN.md).
 
 Work in progress.
 
-- Done: project setup (TypeScript, tests, linting, CI on three operating systems) and the
-  domain model (exact decimal parsing, instruments, candles, market order fills and a
-  long-only portfolio), with property-based tests for the accounting.
-- Next: downloading and validating historical candles from Binance's public market data.
+- Done:
+  - project setup (TypeScript, tests, linting, CI on three operating systems)
+  - the domain model (exact decimal parsing, instruments, candles, market order fills and a
+    long-only portfolio), with property-based tests for the accounting
+  - market data: downloading monthly candles from Binance with checksum verification, and
+    loading them into one validated series
+- Next: the event-driven engine loop.
 
 ## Getting started
 
