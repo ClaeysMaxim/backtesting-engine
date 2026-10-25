@@ -150,7 +150,7 @@ vite.config.ts.timestamp-*
 
 
 # Marktdata (te groot voor git, wordt gedownload)
-data/
+/data/
 
 # OS-bestanden
 .DS_Store
