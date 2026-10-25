@@ -9,6 +9,8 @@ export {
 export type { Archive } from './data/binance-archive.ts';
 export { parseKlineCsv, parseKlineRow } from './data/binance-klines.ts';
 export { verifySha256 } from './data/checksum.ts';
+export { downloadArchive } from './data/download.ts';
+export type { DownloadResult, Fetch } from './data/download.ts';
 export { findSeriesProblems, INTERVALS, isInterval } from './data/series.ts';
 export type { Interval, SeriesProblem } from './data/series.ts';
 export { readZip } from './data/zip.ts';
